@@ -1,0 +1,35 @@
+GOAL RECORDER - COME OTTENERE L'APK (una volta sola, poi e' automatico)
+
+Serve l'account GitHub (lactreviso). Il PC non deve installare niente: l'APK lo costruisce GitHub.
+
+1) NUOVO REPOSITORY
+   github.com > "+" in alto a destra > New repository
+   Nome: goal-recorder-app     Public     > Create repository
+
+2) CARICA I FILE
+   Nella pagina del repository: "uploading an existing file".
+   Trascina TUTTO il contenuto di questa cartella (anche la cartella .github e la cartella app),
+   poi "Commit changes".
+
+3) CHIAVE DI FIRMA (dallo zip "chiave di firma")
+   Settings > Secrets and variables > Actions > New repository secret, due volte:
+     Name: KEYSTORE_BASE64      Secret: tutto il testo del file keystore_base64.txt
+     Name: KEYSTORE_PASSWORD    Secret: la password scritta in LEGGIMI_chiave.txt
+
+4) COSTRUISCI
+   Scheda Actions > "Costruisci APK Goal Recorder" > Run workflow > Run workflow.
+   (Se la prima esecuzione, partita da sola al punto 2, e' rossa: era senza chiave. Ora riparte giusta.)
+   Dopo circa 5 minuti diventa verde.
+
+5) SCARICA E MANDA
+   Pagina del repository > Releases (a destra) > "Goal Recorder 1.0.N" > GoalRecorder.apk
+   Link fisso da mandare alle squadre (si aggiorna da solo a ogni nuova versione):
+     https://github.com/lactreviso/goal-recorder-app/releases/download/apk/GoalRecorder.apk
+
+6) INSTALLA
+   Disinstalla prima la vecchia "Goal Recorder" (quella fatta con PWABuilder), poi apri GoalRecorder.apk
+   e consenti "Installa app sconosciute". Al primo avvio della camera l'app chiede fotocamera e microfono.
+
+AGGIORNAMENTI
+   Modifichi (o ricarichi) app/src/main/assets/www/index.html nel repository: GitHub ricostruisce l'APK da solo,
+   allo stesso link. Il nuovo APK si installa sopra il vecchio (stessa chiave, numero di versione piu' alto).
