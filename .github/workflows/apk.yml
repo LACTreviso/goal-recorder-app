@@ -32,11 +32,23 @@ jobs:
             echo "::error::Mancano i Secrets KEYSTORE_BASE64 e KEYSTORE_PASSWORD (Settings > Secrets and variables > Actions)"
             exit 1
           fi
-          echo "$KEYSTORE_BASE64" | base64 -d > app/goalrecorder.keystore
+          # tolgo a capo, spazi e caratteri estranei finiti dentro con il copia-incolla
+          CHIAVE=$(printf '%s' "$KEYSTORE_BASE64" | tr -cd 'A-Za-z0-9+/=')
+          PW=$(printf '%s' "$KEYSTORE_PASSWORD" | tr -d ' \t\r\n')
+          echo "::add-mask::$PW"
+          echo "KEYSTORE_BASE64: ${#CHIAVE} caratteri (giusto: 3696)"
+          if [ "${#CHIAVE}" -ne 3696 ] || ! printf '%s' "$CHIAVE" | base64 -d > app/goalrecorder.keystore 2>/dev/null; then
+            echo "::error::Il Secret KEYSTORE_BASE64 non e' giusto (${#CHIAVE} caratteri invece di 3696): rimettilo incollando TUTTO il testo di keystore_base64.txt"
+            exit 1
+          fi
+          if ! keytool -list -storetype PKCS12 -keystore app/goalrecorder.keystore -storepass "$PW" > /dev/null 2>&1; then
+            echo "::error::La chiave c'e' ma la password non la apre: rimetti il Secret KEYSTORE_PASSWORD copiando solo la password da LEGGIMI_chiave.txt"
+            exit 1
+          fi
+          echo "KEYSTORE_PASSWORD=$PW" >> "$GITHUB_ENV"
+          echo "Chiave di firma OK"
 
       - name: Compila
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: gradle --no-daemon :app:assembleRelease
 
       - name: Prepara il file
