@@ -1,0 +1,45 @@
+plugins {
+    id 'com.android.application'
+}
+
+// ogni compilazione su GitHub ha un numero piu' alto: cosi' l'APK nuovo si installa sopra il vecchio
+def numeroBuild = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+
+android {
+    namespace 'it.lact.goalrecorder'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'it.lact.goalrecorder'
+        minSdk 26
+        targetSdk 34
+        versionCode numeroBuild
+        versionName "1.0." + numeroBuild
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('goalrecorder.keystore')
+            storePassword System.getenv('KEYSTORE_PASSWORD')
+            keyAlias 'goalrecorder'
+            keyPassword System.getenv('KEYSTORE_PASSWORD')
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
