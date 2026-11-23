@@ -23,10 +23,14 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.ServiceWorkerClient;
 import android.webkit.ServiceWorkerController;
 import android.webkit.WebChromeClient;
@@ -82,6 +86,26 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle stato) {
         super.onCreate(stato);
+        sistemaVideoInSospeso();
+        if (Build.VERSION.SDK_INT >= 24) {
+            ServiceWorkerController.getInstance().setServiceWorkerClient(new ServiceWorkerClient() {
+                @Override
+                public WebResourceResponse shouldInterceptRequest(WebResourceRequest r) {
+                    return risorsa(r.getUrl());
+                }
+            });
+        }
+        creaWeb(stato);
+        // telefoni vecchi (Android 8-9): per scrivere in Download serve il permesso, lo si chiede subito.
+        // Fotocamera e microfono si chiedono solo quando servono (sul telefono che fa da camera).
+        if (Build.VERSION.SDK_INT < 29
+                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RICHIESTA_PERMESSI);
+    }
+
+    /** La pagina dentro l'app. Se il motore della pagina va in crash (memoria, driver video...) la si ricrea da sola:
+     *  i video aperti restano salvati fino a quel punto e la pagina riparte a registrare da sola (vedi index.html). */
+    void creaWeb(Bundle stato) {
         web = new WebView(this);
         setContentView(web);
         WebSettings s = web.getSettings();
@@ -99,6 +123,28 @@ public class MainActivity extends Activity {
             }
 
             @Override
+            public boolean onRenderProcessGone(WebView v, RenderProcessGoneDetail d) {
+                chiudiTutti();
+                if (v == web) {
+                    try {
+                        ((ViewGroup) v.getParent()).removeView(v);
+                    } catch (Exception e) {
+                        // gia' tolta
+                    }
+                    try {
+                        v.destroy();
+                    } catch (Exception e) {
+                        // niente
+                    }
+                    web = null;
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        if (web == null && !isFinishing()) creaWeb(null);
+                    }, 700);
+                }
+                return true;                                     // l'app resta aperta
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
                 Uri u = r.getUrl();
                 if (HOST.equals(u.getHost())) return false;
@@ -110,14 +156,6 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-        if (Build.VERSION.SDK_INT >= 24) {
-            ServiceWorkerController.getInstance().setServiceWorkerClient(new ServiceWorkerClient() {
-                @Override
-                public WebResourceResponse shouldInterceptRequest(WebResourceRequest r) {
-                    return risorsa(r.getUrl());
-                }
-            });
-        }
         web.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest req) {
@@ -134,11 +172,40 @@ public class MainActivity extends Activity {
         });
         if (stato != null) web.restoreState(stato);
         else web.loadUrl(URL_INIZIO);
-        // telefoni vecchi (Android 8-9): per scrivere in Download serve il permesso, lo si chiede subito.
-        // Fotocamera e microfono si chiedono solo quando servono (sul telefono che fa da camera).
-        if (Build.VERSION.SDK_INT < 29
-                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RICHIESTA_PERMESSI);
+    }
+
+    void chiudiTutti() {
+        synchronized (aperti) {
+            for (Scrittura w : aperti.values()) chiudi(w);
+            aperti.clear();
+        }
+    }
+
+    /** Video rimasti "in scrittura" da una volta precedente (app chiusa di colpo): si rendono visibili, cosi' non
+     *  spariscono (Android cancella dopo qualche giorno i file lasciati a meta'). */
+    void sistemaVideoInSospeso() {
+        if (Build.VERSION.SDK_INT < 29) return;
+        try {
+            Uri u = MediaStore.setIncludePending(MediaStore.Downloads.EXTERNAL_CONTENT_URI);
+            String sel = MediaStore.MediaColumns.IS_PENDING + "=1 AND " + MediaStore.MediaColumns.RELATIVE_PATH + "=?";
+            String[] arg = {Environment.DIRECTORY_DOWNLOADS + "/" + CARTELLA + "/"};
+            List<Uri> trovati = new ArrayList<>();
+            try (Cursor c = getContentResolver().query(u, new String[]{MediaStore.MediaColumns._ID}, sel, arg, null)) {
+                while (c != null && c.moveToNext())
+                    trovati.add(ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, c.getLong(0)));
+            }
+            for (Uri x : trovati) {
+                ContentValues cv = new ContentValues();
+                cv.put(MediaStore.MediaColumns.IS_PENDING, 0);
+                try {
+                    getContentResolver().update(x, cv, null, null);
+                } catch (Exception e) {
+                    // non nostro o gia' a posto
+                }
+            }
+        } catch (Exception e) {
+            // niente da sistemare
+        }
     }
 
     /** I file della pagina vengono dall'app (assets/www), come se fossero su https://appassets.androidplatform.net */
@@ -194,21 +261,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
-        web.saveState(out);
+        if (web != null) web.saveState(out);
     }
 
     @Override
     public void onBackPressed() {
-        if (web.canGoBack()) web.goBack();
+        if (web != null && web.canGoBack()) web.goBack();
         else super.onBackPressed();
     }
 
     @Override
     protected void onDestroy() {
-        synchronized (aperti) {
-            for (Scrittura w : aperti.values()) chiudi(w);
-            aperti.clear();
-        }
+        chiudiTutti();
         super.onDestroy();
     }
 
@@ -334,7 +398,18 @@ public class MainActivity extends Activity {
     class Ponte {
         @JavascriptInterface
         public String versione() {
-            return "1.0";
+            try {
+                return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            } catch (Exception e) {
+                return "1.1";
+            }
+        }
+
+        /** Marca e modello del telefono: per il pannello delle chiavi della lega (chi usa la chiave). */
+        @JavascriptInterface
+        public String modello() {
+            String m = (Build.MANUFACTURER + " " + Build.MODEL).trim();
+            return m.length() > 60 ? m.substring(0, 60) : m;
         }
 
         @JavascriptInterface

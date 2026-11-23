@@ -95,6 +95,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .vmsg b{color:var(--tx)}
 .vmsg .cc{color:var(--acc);letter-spacing:2px}
 .note{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:#000b;padding:4px 10px;border-radius:999px;font-size:12px;color:#c9d2de;white-space:nowrap}
+.note.tap{cursor:pointer;border:1px solid #ffd27a;color:#ffe2a8}
 .expand{position:absolute;right:8px;bottom:8px;width:36px;height:36px;padding:0;border-radius:10px;background:#000a}
 .cbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:10px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
@@ -201,6 +202,17 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--acc);height:30px;margin:
 .legafoot{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px 0 0;color:var(--mut);font-size:12.5px}
 .legafoot .lega{width:40px;height:40px}
 
+/* ---------- CHIAVE DELLA SQUADRA ---------- */
+.licin{font:700 18px/1.2 ui-monospace,"Roboto Mono",Consolas,monospace;letter-spacing:1px;text-align:center;padding:14px 10px;text-transform:uppercase}
+.licin::placeholder{color:#4a5566}
+.licsq{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);margin:0 0 10px;font-size:14px}
+.licsq code{grid-column:1/-1;font:12.5px ui-monospace,Consolas,monospace;color:var(--mut)}
+.licinfo{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 12px;padding:9px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+  font-weight:500;font-size:13px;color:var(--mut);justify-content:flex-start;text-align:left}
+.licinfo b{color:var(--tx);font-weight:600}
+.licinfo.warn{border-color:#f5a52466;color:#ffd58a}
+.licinfo .dot{margin-right:2px}
+
 /* ---------- PARTITA: orari di inizio tempi e gol ---------- */
 .evbar{position:fixed;left:0;right:0;bottom:calc(108px + env(safe-area-inset-bottom));z-index:19;display:flex;gap:6px;align-items:stretch;padding:8px 10px;background:#0b0d11f0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line)}
 .evbar button{padding:8px 6px;font-size:12.5px;border-radius:11px;flex:1 1 0;min-width:0;flex-direction:column;gap:1px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -236,6 +248,7 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--acc);height:30px;margin:
       <span class="lega" title="Lega Amatori Calcio Treviso"><img data-logo="lact" alt="Lega Amatori Calcio Treviso"></span>
     </div>
 
+    <button class="licinfo" id="licInfo" hidden></button>
     <div class="panel">
       <div class="ph"><div class="ico"><i data-i="remote"></i></div><div><b>Controller</b><p class="mut">Il telefono che tieni in mano, quello con l'hotspot.</p></div></div>
       <button class="pri big" id="bCtrl">Apri il controller</button>
@@ -263,6 +276,31 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--acc);height:30px;margin:
       <li>Alza il volume del controller: all'avvio emette un beep che serve ad allineare i due video in montaggio.</li>
       <li>Durante la partita, sul controller, tocca <b>Inizio 1T / Inizio 2T</b> al fischio e <b>GOL</b> a ogni gol: le camere salvano gli orari accanto ai video e Goal Extractor taglia le clip da solo.</li>
     </ul>
+    <div class="legafoot"><span class="lega"><img data-logo="lact" alt=""></span><span>Lega Amatori Calcio Treviso</span></div>
+  </div>
+</section>
+
+<!-- ================= CHIAVE DELLA SQUADRA ================= -->
+<section id="lic" class="page" hidden>
+  <div class="home">
+    <div class="logo">
+      <div class="mark"><i data-i="logo"></i></div>
+      <div><h1>Goal Recorder</h1><p class="mut">Due telefoni sul palo, uno in mano.</p></div>
+      <span class="lega" title="Lega Amatori Calcio Treviso"><img data-logo="lact" alt="Lega Amatori Calcio Treviso"></span>
+    </div>
+    <div class="panel">
+      <div class="ph"><div class="ico"><i data-i="key"></i></div><div><b id="licTit">Attiva Goal Recorder</b><p class="mut" id="licSub">Scrivi la chiave della tua squadra: te la dà la Lega Amatori Calcio Treviso. È la stessa di Goal Extractor.</p></div></div>
+      <div class="licsq" id="licSq" hidden></div>
+      <input id="licK" class="tin licin" placeholder="LACT-XXXX-XXXX-XXXX-XXXX" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="32" aria-label="Chiave della squadra">
+      <p id="licMsg" class="msg"></p>
+      <button class="pri big" id="licOk">Attiva</button>
+    </div>
+    <ul class="tips">
+      <li>Va scritta solo sul telefono <b>controller</b>: le camere la ricevono da lui quando si collegano.</li>
+      <li>Serve internet per attivarla e poi almeno una volta ogni 14 giorni.</li>
+      <li>Alla lega arrivano solo la chiave e il tipo di telefono: i video restano sui telefoni.</li>
+    </ul>
+    <button class="ghost wide" id="licIndietro" style="margin-top:14px">Indietro</button>
     <div class="legafoot"><span class="lega"><img data-logo="lact" alt=""></span><span>Lega Amatori Calcio Treviso</span></div>
   </div>
 </section>
@@ -421,6 +459,7 @@ const I={
  share:sv('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>'),
  trash:sv('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'),
  bolt:sv('<path d="M13 2 4 14h7l-1 8 9-12h-7Z"/>'),
+ key:sv('<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14.5 8.5l2 2"/>'),
  rec:'<span class="rdot"></span>',
  stop:'<span class="rsq"></span>'
 };
@@ -430,6 +469,175 @@ const LOGHI={lact:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKoAAACWCAYAAAB
 $$('img[data-logo]').forEach(e=>{const s=LOGHI[e.dataset.logo];if(s)e.src=s;else e.closest('.lega').hidden=true});
 
 function show(id){$$('.page').forEach(s=>s.hidden=s.id!==id)}
+/* ================================================================
+   CHIAVE DELLA SQUADRA (la stessa di Goal Extractor: progetto Firebase della lega)
+   - il controller la vuole; le camere la ricevono dal controller quando si collegano;
+   - senza internet si lavora fino a 14 giorni dall'ultimo controllo riuscito (mai oltre la scadenza);
+   - una registrazione interrotta riparte sempre (ripresa automatica), qualunque cosa dica la chiave.
+   ================================================================ */
+const LIC_CFG={apiKey:'@@APIKEY@@',projectId:'@@PROJECTID@@'};
+const LIC_GRAZIA=14*86400e3,LIC_RIC=6*3600e3;
+const LIC_TXT={mancante:'Scrivi la chiave della tua squadra.',inesistente:'Questa chiave non esiste: controlla di averla scritta giusta (te la dà la lega).',
+  disattivata:'Questa chiave è stata disattivata dalla lega.',scaduta:'Questa chiave è scaduta: chiedi alla lega di rinnovarla.',
+  serve_internet:'Collegati a internet per verificare la chiave (serve almeno una volta ogni 14 giorni).',
+  non_configurato:'Le chiavi della lega non sono ancora attive: riprova più tardi o chiedi alla lega.'};
+/* il collegamento al progetto Firebase: scritto qui, oppure dal sito della lega (licenze.txt: il blocco firebaseConfig),
+   tenuto nel telefono e riguardato una volta alla settimana */
+const LIC_URL_CFG='https://lactreviso.github.io/Puntamento/licenze.txt';
+let LIC_CFG_ESITO='';
+function licLeggiCfg(t){const a=/apiKey["']?\s*[:=]\s*["']([A-Za-z0-9_\-]{20,80})["']/.exec(t||''),p=/projectId["']?\s*[:=]\s*["']([a-z0-9][a-z0-9\-]{3,40})["']/.exec(t||'');return a&&p?{apiKey:a[1],projectId:p[1]}:null}
+function licCfg(){if(!LIC_CFG.apiKey.startsWith('@@')&&!LIC_CFG.projectId.startsWith('@@'))return LIC_CFG;const c=LS.get('licCfg',null);return c&&c.apiKey&&c.projectId?c:null}
+async function licCfgCarica(){
+  if(!LIC_CFG.apiKey.startsWith('@@'))return LIC_CFG;
+  const c=licCfg();if(c&&Date.now()-LS.get('licCfgT',0)<7*86400e3)return c;
+  try{const r=await licFetch(LIC_URL_CFG+'?t='+Date.now());const x=r.ok?licLeggiCfg(await r.text()):null;
+    if(x){LS.set('licCfg',x);LS.set('licCfgT',Date.now());LIC_CFG_ESITO='ok';return x}LIC_CFG_ESITO='vuoto'}
+  catch(e){LIC_CFG_ESITO='rete'}
+  return c;
+}
+const licConf=()=>!!licCfg();
+const licSenzaCfg=()=>LIC_CFG_ESITO==='rete'?'serve_internet':LIC_CFG_ESITO==='vuoto'?'non_configurato':'mancante';
+const licBase=()=>'https://firestore.googleapis.com/v1/projects/'+encodeURIComponent(licCfg().projectId)+'/databases/(default)/documents/licenze/';
+function licNorm(k){let s=String(k||'').toUpperCase().replace(/[^0-9A-Z]/g,'').replace(/O/g,'0').replace(/I/g,'1');if(s.startsWith('LACT'))s=s.slice(4);return s.length===16?'LACT-'+s.match(/.{4}/g).join('-'):''}
+function licDisp(){let d=LS.get('licDisp','');if(!/^[0-9a-f]{20}$/.test(d)){const a=new Uint8Array(10);crypto.getRandomValues(a);d=[...a].map(x=>x.toString(16).padStart(2,'0')).join('');LS.set('licDisp',d)}return d}
+const licDati=()=>LS.get('lic',{})||{};
+function licValuta(d){
+  d=d||licDati();
+  const e=(st,x)=>Object.assign({ok:st==='ok',stato:st,messaggio:LIC_TXT[st]||'',squadra:d.squadra||'',chiave:d.chiave||'',
+    scadenza:d.scadenza?new Date(d.scadenza).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):''},x||{});
+  if(!d.chiave)return e(licConf()?'mancante':licSenzaCfg());
+  if(d.esiste===false)return e('inesistente');
+  if(!d.attiva)return e('disattivata');
+  const ora=Math.max(Date.now(),d.visto||0);                     // l'orologio spostato indietro non allunga la chiave
+  if(!d.scadenza||new Date(d.scadenza).getTime()<ora)return e('scaduta');
+  const g=ora-(d.verificata||0);
+  if(g>LIC_GRAZIA)return e('serve_internet');
+  return e('ok',{offline:g>LIC_RIC+60e3,giorni:Math.max(0,Math.ceil((LIC_GRAZIA-g)/86400e3))});
+}
+async function licFetch(url,opz){
+  const ab=new AbortController(),t=setTimeout(()=>ab.abort(),8000);
+  try{return await fetch(url,Object.assign({cache:'no-store',signal:ab.signal},opz||{}))}finally{clearTimeout(t)}
+}
+/* legge licenze/<chiave>: {esiste,squadra,scadenza,attiva}; eccezione se non c'è internet */
+async function licLeggi(k){
+  const r=await licFetch(licBase()+encodeURIComponent(k)+'?key='+encodeURIComponent(licCfg().apiKey));
+  if(r.status===404||r.status===403)return{esiste:false};
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const f=(await r.json()).fields||{},v=x=>x?(x.stringValue??x.booleanValue??x.timestampValue??null):null;
+  return{esiste:true,squadra:v(f.squadra)||'',scadenza:v(f.scadenza)||'',attiva:!!v(f.attiva)};
+}
+async function licModello(){
+  try{if(NAT&&NAT.modello)return String(NAT.modello()).slice(0,60)}catch(e){}
+  try{if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){const h=await navigator.userAgentData.getHighEntropyValues(['model','platformVersion']);if(h.model)return h.model.slice(0,60)}}catch(e){}
+  return 'telefono';
+}
+/* licenze/<chiave>/usi/<telefono>: chi usa la chiave (nel pannello della lega) */
+async function licUso(k,ruolo){
+  try{
+    const d=licDati(),primo=!d.usata||d.usataK!==k,adesso=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+    let ver='sito';try{if(NAT&&NAT.versione)ver='app '+NAT.versione()}catch(e){}
+    const so=((navigator.userAgent.match(/Android [\d.]+/)||[])[0]||(navigator.userAgentData&&navigator.userAgentData.platform)||'browser').slice(0,60);
+    const f={app:{stringValue:'goal_recorder'},versione:{stringValue:(ver+' · '+ruolo).slice(0,60)},sistema:{stringValue:so},nome:{stringValue:await licModello()},ultimo:{timestampValue:adesso}};
+    if(primo)f.primo={timestampValue:adesso};
+    const m=Object.keys(f).map(x=>'&updateMask.fieldPaths='+x).join('');
+    const r=await licFetch(licBase()+encodeURIComponent(k)+'/usi/'+licDisp()+'?key='+encodeURIComponent(licCfg().apiKey)+m,
+      {method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:f})});
+    if(r.ok){const x=licDati();if(x.chiave===k){x.usata=true;x.usataK=k;LS.set('lic',x)}}
+  }catch(e){}
+}
+let LIC_ULT=0,LIC_IN=false;
+/* controlla la chiave su internet (al massimo ogni 6 ore, o subito con forza); senza internet tiene l'ultimo controllo */
+async function licControlla(forza,ruolo){
+  const d=licDati();
+  if(!d.chiave||LIC_IN||(!forza&&Date.now()-LIC_ULT<LIC_RIC&&d.verificata)){if(!d.chiave&&!licConf())await licCfgCarica();licInfo();return licValuta()}
+  LIC_IN=true;LIC_ULT=Date.now();
+  try{
+    if(!await licCfgCarica())throw new Error('senza collegamento');
+    const x=await licLeggi(d.chiave),n=licDati();
+    if(n.chiave===d.chiave){Object.assign(n,x,{verificata:Date.now(),visto:Math.max(Date.now(),n.visto||0)});LS.set('lic',n)}
+    if(x.esiste&&x.attiva)licUso(d.chiave,ruolo||MODE);
+  }catch(e){}finally{LIC_IN=false}
+  licInfo();return licValuta();
+}
+async function licAttiva(testo){
+  const k=licNorm(testo);
+  if(!k)return Object.assign(licValuta(),{ok:false,messaggio:'La chiave ha questa forma: LACT-XXXX-XXXX-XXXX-XXXX.'});
+  if(!await licCfgCarica())return Object.assign(licValuta({}),{ok:false,messaggio:LIC_CFG_ESITO==='rete'?'Per attivare la chiave serve internet: collegati e riprova.':LIC_TXT.non_configurato});
+  let x;
+  try{x=await licLeggi(k)}catch(e){return Object.assign(licValuta(),{ok:false,messaggio:'Per attivare la chiave serve internet: collegati e riprova.'})}
+  if(!x.esiste)return Object.assign(licValuta({chiave:k,esiste:false}),{chiave:''});
+  const d=Object.assign(licDati(),x,{chiave:k,verificata:Date.now(),visto:Math.max(Date.now(),licDati().visto||0),usata:false});
+  LS.set('lic',d);LIC_ULT=Date.now();
+  const r=licValuta(d);if(r.ok)licUso(k,'controller');
+  licInfo();return r;
+}
+/* la camera riceve la chiave dal controller (che l'ha verificata da poco) */
+function licDaController(m){
+  const k=licNorm(m&&m.k);if(!k)return;
+  const d=licDati();
+  if(d.chiave!==k||!d.verificata||(m.verificata||0)>(d.verificata||0)){
+    LS.set('lic',Object.assign(d,{chiave:k,squadra:m.squadra||'',scadenza:m.scadenza||'',attiva:true,esiste:true,
+      verificata:Math.min(Date.now(),m.verificata||Date.now()),visto:Math.max(Date.now(),d.visto||0),usata:d.chiave===k&&d.usata}));
+  }
+  setTimeout(()=>licControlla(d.chiave!==k,'camera'),3000);
+}
+const licPerCamera=()=>{const d=licDati(),r=licValuta(d);return r.ok?{t:'lic',k:d.chiave,squadra:d.squadra,scadenza:d.scadenza,verificata:d.verificata}:null};
+function licInfo(){
+  const b=$('#licInfo');if(!b)return;
+  const r=licValuta();
+  if(r.stato==='non_configurato'&&!LIC_CFG_ESITO){b.hidden=true;return}
+  b.hidden=false;b.classList.toggle('warn',!r.ok||!!r.offline);
+  b.innerHTML=r.ok?'<span class="dot ok"></span><span>Chiave di <b>'+esc(r.squadra||'squadra')+'</b> · fino al '+esc(r.scadenza)+
+    (r.offline?' · senza internet: collegati entro '+r.giorni+(r.giorni===1?' giorno':' giorni'):'')+'</span>'
+    :'<span class="dot err"></span><span>'+(r.stato==='mancante'?'Nessuna chiave: si scrive sul controller':esc(r.messaggio))+'</span>';
+}
+let LIC_DOPO=null;
+const licRiprova=()=>['serve_internet','disattivata','scaduta'].includes(licValuta().stato)&&!!licDati().chiave;
+function licEtichetta(){const st=licValuta().stato;$('#licOk').textContent=st==='non_configurato'?'Riprova':$('#licK').value.trim()||!licRiprova()?'Attiva':st==='serve_internet'?'Riprova':'Controlla di nuovo'}
+function licMostra(r,msg,dopo){
+  r=r||licValuta();if(dopo!==undefined)LIC_DOPO=dopo;
+  const st=r.stato,sq=(st==='disattivata'||st==='scaduta'||st==='serve_internet')&&r.chiave;
+  $('#licTit').textContent={disattivata:'Chiave disattivata',scaduta:'Chiave scaduta',serve_internet:'Collegati a internet',non_configurato:'Chiavi non ancora attive'}[st]||(r.ok?'Chiave della squadra':'Attiva Goal Recorder');
+  $('#licSub').textContent=st==='disattivata'||st==='scaduta'?'Chiedi alla lega di rinnovarla, oppure scrivi una nuova chiave.'
+    :st==='serve_internet'||st==='non_configurato'?r.messaggio
+    :r.ok?'Questa è la chiave del telefono. Per cambiarla scrivine un\'altra.':'Scrivi la chiave della tua squadra: te la dà la Lega Amatori Calcio Treviso. È la stessa di Goal Extractor.';
+  $('#licSq').hidden=!(sq||r.ok);
+  if(sq||r.ok)$('#licSq').innerHTML='<b>'+esc(r.squadra||'Squadra')+'</b><span class="mut">'+(r.scadenza?(st==='scaduta'?'scaduta il ':'fino al ')+esc(r.scadenza):'')+'</span><code>'+esc(r.chiave)+'</code>';
+  if($('#licK').value.trim().toUpperCase()===r.chiave)$('#licK').value='';
+  $('#licK').hidden=st==='non_configurato';$('#licOk').hidden=false;
+  licEtichetta();
+  $('#licMsg').textContent=msg!==undefined?msg:(st==='inesistente'||st==='disattivata'||st==='scaduta'?r.messaggio:'');
+  show('lic');
+}
+async function licPoi(fn){
+  const r=licValuta();
+  if(r.ok){fn();setTimeout(()=>licControlla(false,'controller'),2000);return}
+  licMostra(r,undefined,fn);
+  const r2=await licControlla(true,'controller');                 // magari è stata rinnovata: controllo subito
+  if(r2.ok&&!$('#lic').hidden&&LIC_DOPO===fn){LIC_DOPO=null;show('home');fn()}
+  else if(!$('#lic').hidden)licMostra(r2);
+}
+function licWire(){
+  $('#licK').addEventListener('input',()=>{const el=$('#licK'),fine=el.selectionStart===el.value.length;
+    const v=el.value.toUpperCase().replace(/[^0-9A-Z]/g,''),c=v.startsWith('LACT')?v.slice(4):v;
+    const f=c?'LACT-'+(c.match(/.{1,4}/g)||[]).slice(0,4).join('-'):v;if(fine&&f!==el.value)el.value=f;
+    $('#licMsg').textContent='';licEtichetta()});
+  $('#licK').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#licOk').click()}});
+  $('#licOk').onclick=async()=>{
+    const b=$('#licOk'),k=$('#licK').value.trim();b.disabled=true;b.textContent='Controllo…';
+    let r;
+    try{
+      if(!k&&(licRiprova()||licValuta().stato==='non_configurato')){LIC_CFG_ESITO='';r=await licControlla(true,'controller');if(r.stato==='mancante'){licMostra(r,'');return}}
+      else if(!k){licMostra(licValuta(),'Scrivi la chiave: LACT-XXXX-XXXX-XXXX-XXXX.');return}
+      else r=await licAttiva(k);
+    }finally{b.disabled=false;licEtichetta()}
+    if(r.ok){$('#licK').value='';toast('Chiave attiva: '+(r.squadra||'squadra'),'ok');const f=LIC_DOPO;LIC_DOPO=null;show('home');licInfo();if(f)f()}
+    else licMostra(r.stato==='inesistente'||r.stato==='disattivata'||r.stato==='scaduta'?r:licValuta(),r.messaggio);
+  };
+  $('#licIndietro').onclick=()=>{LIC_DOPO=null;show('home');licInfo()};
+  $('#licInfo').onclick=()=>licMostra(licValuta(),'',null);
+}
+
 let toastT;
 function toast(m,k=''){const t=$('#toast');t.textContent=m;t.className='toast show '+k;clearTimeout(toastT);toastT=setTimeout(()=>t.className='toast',3400)}
 
@@ -486,6 +694,7 @@ async function startCtrl(){
   document.body.classList.toggle('nogrid',!C.grid);$('#bGrid').classList.toggle('on',C.grid);
   buildTiles();
   C.code=LS.get('ctrlCode',null)||newCode();
+  C.sess=LS.get('sess',null);if(C.sess&&Date.now()-C.sess.at>4*3600e3){C.sess=null;LS.set('sess',null)}
   ctrlConnect();
   $('#bRec').onclick=onRecPress;
   $('#bGrid').onclick=()=>{C.grid=!C.grid;LS.set('grid',C.grid);document.body.classList.toggle('nogrid',!C.grid);$('#bGrid').classList.toggle('on',C.grid)};
@@ -522,7 +731,7 @@ function onCamConn(c){
   if(!cam){try{c.close()}catch(e){}return}
   if(cam.conn&&cam.conn!==c){try{cam.conn.close()}catch(e){}}
   cam.conn=c;
-  c.on('open',()=>{cam.seen=Date.now();try{c.send({t:'cfg',q:C.cfg.q,prev:C.cfg.prev})}catch(e){}});
+  c.on('open',()=>{cam.seen=Date.now();cam.colleg=Date.now();try{c.send({t:'cfg',q:C.cfg.q,prev:C.cfg.prev});const l=licPerCamera();if(l)c.send(l)}catch(e){}});
   c.on('data',d=>onCamData(cam,c,d));
   c.on('close',()=>{if(cam.conn===c){cam.conn=null;renderCam(n)}});
   c.on('error',()=>{});
@@ -540,10 +749,31 @@ function onCamData(cam,c,d){
   if(!d||!d.t)return;
   cam.seen=Date.now();
   if(d.t==='ping'){try{c.send({t:'pong',a:d.a,b:Date.now()})}catch(e){}return}
-  if(d.t==='st'){const prima=cam.st;cam.st=d;cam.stAt=Date.now();renderCam(cam.n);if(d.rec&&!(prima&&prima.rec)&&EV.reg.length)evInvia()}
+  if(d.t==='st'){const prima=cam.st;cam.st=d;cam.stAt=Date.now();renderCam(cam.n);if(d.rec&&!(prima&&prima.rec)&&EV.reg.length)evInvia();controllaRec(cam,d)}
+  else if(d.t==='ripresa'){
+    allarme('Camera '+cam.n+': '+d.msg);
+    if(d.ok&&d.base){evNuovaReg(d.base,d.at||Date.now());setTimeout(evInvia,1500)}
+  }
   else if(d.t==='saved')toast('Camera '+cam.n+': video salvato ('+gb(d.size)+')','ok');
   else if(d.t==='err')toast('Camera '+cam.n+': '+d.msg,'bad');
   else if(d.t==='info')toast('Camera '+cam.n+': '+d.msg);
+}
+/* partita in registrazione (dal controller): se una camera si ricollega e NON registra (pagina andata in crash,
+   telefono riavviato...) suona l'allarme e la registrazione riparte da sola su quella camera */
+function controllaRec(cam,d){
+  if(!C.sess||Date.now()-C.sess.at>4*3600e3)return;
+  if(d.rec||d.arming||d.saving)return;
+  if(!cam.colleg||Date.now()-cam.colleg>20000||Date.now()-C.sess.at<10000)return;
+  if(cam.riavvio&&Date.now()-cam.riavvio<60000)return;
+  cam.riavvio=Date.now();
+  const at=Date.now()+800,base='GoalRecorder_'+stamp(new Date(at));
+  csend(cam.n,{t:'rec',at,base});evNuovaReg(base,at);setTimeout(evInvia,2500);
+  allarme('Camera '+cam.n+' si è ricollegata ma NON stava registrando: la registrazione riparte adesso.');
+}
+function allarme(msg){
+  toast(msg,'bad');
+  try{navigator.vibrate&&navigator.vibrate([400,150,400,150,400])}catch(_){}
+  try{ensureAudio();const a=C.actx;if(a){const t0=a.currentTime+.05;[0,.25,.5].forEach(dt=>{const o=a.createOscillator(),g=a.createGain(),t=t0+dt;o.type='square';o.frequency.value=880;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.4,t+.01);g.gain.setValueAtTime(.4,t+.18);g.gain.linearRampToValueAtTime(0,t+.2);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.22)})}}catch(_){}
 }
 function csend(n,m){const c=C.cams[n]&&C.cams[n].conn;if(c&&c.open){try{c.send(m)}catch(e){}}}
 const alive=cam=>!!(cam.conn&&cam.conn.open&&Date.now()-cam.seen<8000);
@@ -574,6 +804,7 @@ function buildTiles(){
     el.zp.onclick=()=>ctrlZoomStep(n,1);
     el.zv.onclick=()=>{const zc=cam.st&&cam.st.zc;if(zc)ctrlZoom(n,zc.min)};
     el.lens.onclick=()=>{csend(n,{t:'lens'});toast('Camera '+n+': cambio lente…')};
+    el.note.onclick=e=>{const st=cam.st;if(st&&st.ps){e.stopPropagation();csend(n,{t:'prev'});toast('Camera '+n+': anteprima richiesta…')}};
     const tog=()=>{d.classList.toggle('max');$('.expand',d).innerHTML=d.classList.contains('max')?I.shrink:I.expand;setTimeout(()=>fitGrid(el.vp),60)};
     $('.expand',d).onclick=e=>{e.stopPropagation();tog()};
     el.vp.onclick=tog;
@@ -614,7 +845,8 @@ function renderCam(n){
   else{el.vt.textContent='Collegata · anteprima in arrivo…';el.vs.hidden=true}
   const recNote=ok&&st&&st.rec;
   el.note.hidden=!recNote;
-  if(recNote)el.note.textContent=C.cfg.prev==='off'?'Anteprima in pausa durante la registrazione':'Anteprima ridotta durante la registrazione';
+  if(recNote)el.note.textContent=st.ps?'Anteprima in pausa · tocca qui per vederla':C.cfg.prev==='off'?'Anteprima in pausa durante la registrazione':'Anteprima ridotta durante la registrazione';
+  el.note.classList.toggle('tap',!!(recNote&&st.ps));
   if(ok&&st){
     if(st.batt){const p=Math.round(st.batt.l*100);setChip(el.bat,el.batC,p+'%'+(st.batt.c?I.bolt:''),!st.batt.c&&p<=15?'bad':!st.batt.c&&p<=30?'warn':'')}
     else setChip(el.bat,el.batC,'n/d','');
@@ -663,7 +895,7 @@ async function onRecPress(){
   ensureAudio();
   if(ctrlAnyRec()){
     if(!await ask('Fermare la registrazione?','Le camere chiudono il file e lo salvano nel loro telefono.','Ferma','red'))return;
-    C.pending=0;Object.keys(C.cams).forEach(n=>csend(n,{t:'stop'}));toast('Stop inviato alle camere');return;
+    C.pending=0;C.sess=null;LS.set('sess',null);Object.keys(C.cams).forEach(n=>csend(n,{t:'stop'}));toast('Stop inviato alle camere');return;
   }
   const on=liveNames();
   if(!on.length){toast('Nessuna camera collegata','bad');return}
@@ -676,7 +908,7 @@ async function onRecPress(){
   });
   if(warn.length&&!await ask('Avviare comunque?',warn.join('<br>'),'Avvia','red'))return;
   const at=Date.now()+1500,base='GoalRecorder_'+stamp(new Date(at));
-  C.pending=Date.now();
+  C.pending=Date.now();C.sess={base,at};LS.set('sess',C.sess);
   evNuovaReg(base,at);
   on.forEach(n=>csend(n,{t:'rec',at,base}));
   setTimeout(evInvia,2500);
@@ -807,23 +1039,37 @@ function openSettings(){
 const K={name:'A',code:'',peer:null,conn:null,call:null,v:null,a:null,stream:null,lenses:[],cfg:Object.assign({q:'std',prev:'low'},LS.get('camCfg',{})),
   off:0,rtt:null,samples:[],R:null,zoom:null,batt:null,free:null,linkT:null,lastPong:0,lastPing:0,lastSt:0,switching:false,needReopen:false,dimT:null,tick:0,err:'',errUntil:0};
 
-async function startCam(){
+async function startCam(rip){
+  const ripresa=rip&&rip.code?rip:null;
   const code=$('#codeIn').value.trim();
   if(!/^\d{4}$/.test(code)){$('#homeMsg').textContent='Inserisci il codice a 4 cifre che vedi sul controller.';$('#codeIn').focus();return}
   if(!window.Peer){$('#homeMsg').textContent='Libreria di collegamento non caricata: controlla internet e ricarica.';return}
   K.name=$('#camSeg').dataset.v==='B'?'B':'A';K.code=code;LS.set('camCode',code);LS.set('camName',K.name);
-  if(!await guida('cam'))return;
-  goLandscape();
+  if(!ripresa){if(!await guida('cam'))return;goLandscape()}
+  else if(NAT)goLandscape();
   MODE='cam';show('cam');history.pushState({pc:1},'');keepAwake();
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   $('#camTitle').textContent='Camera '+K.name;$('#camTag').textContent=K.name;$('#camCode').textContent=code;
   $('#cam').classList.toggle('nogrid',!LS.get('camGrid',true));
   watchBox($('#camview'));
   wireCamUI();updCamUI();
-  if(!await openMedia())return;
+  if(!await openMedia()){if(ripresa)avvisoRipresa(ripresa,false);return}
   initBattery();updFree();refreshFilesN();
   camConnect();
   setInterval(camTick,1000);
+  if(ripresa){
+    K.parte=(ripresa.parte||1)+1;
+    const base='GoalRecorder_'+stamp(new Date());
+    await startRec(0,base);
+    avvisoRipresa(ripresa,!!K.R,base);
+  }
+}
+function avvisoRipresa(rip,ok,base){
+  const ora=new Date(rip.ult||Date.now()),hm=p2(ora.getHours())+':'+p2(ora.getMinutes());
+  const msg=ok?'la pagina si era interrotta (ultimo segnale alle '+hm+'): ho ripreso a registrare da solo, parte '+K.parte+'.'
+    :'la pagina si era interrotta alle '+hm+' e non riesco a riaprire la fotocamera: riavvia la registrazione!';
+  camErr(msg,true);toast('Registrazione '+(ok?'ripresa da sola dopo un\'interruzione':'NON ripresa'),ok?'ok':'bad');
+  K.avviso={t:'ripresa',ok,base:base||'',at:Date.now(),parte:K.parte||2,msg};
 }
 function goLandscape(){
   if(NAT){try{NAT.orizzontale(true)}catch(e){}return}
@@ -976,7 +1222,11 @@ function link(){
     clearTimeout(to);if(K.conn!==c)return;
     K.lastPong=Date.now();K.samples=[];linkState('ok','Collegata al controller');
     for(let i=0;i<6;i++)setTimeout(()=>camSend({t:'ping',a:Date.now()}),i*250);
-    sendSt();remakeCall();
+    /* durante la registrazione la nuova anteprima (un secondo codificatore video accanto a quello del file) parte
+       solo se il controller la chiede: meno rischi per la registrazione */
+    if(K.R&&K.R.t0&&!K.R.stopping)K.prevSosp=true;else{K.prevSosp=false;remakeCall()}
+    sendSt();
+    if(K.avviso){camSend(K.avviso);K.avviso=null}
   });
   c.on('data',d=>onCtrlData(d));
   c.on('close',()=>{if(K.conn!==c)return;K.conn=null;linkState('wait','Collegamento perso, riprovo…');relinkSoon(1500)});
@@ -995,6 +1245,8 @@ function onCtrlData(d){
   else if(d.t==='lens')nextLens();
   else if(d.t==='cfg')applyCfg(d);
   else if(d.t==='ev')salvaEventi(d.nome,d.json);
+  else if(d.t==='prev'){K.prevSosp=false;remakeCall();sendSt()}
+  else if(d.t==='lic')licDaController(d);
 }
 /* il controller manda gli orari della partita: la camera li tiene in un file accanto ai video */
 let evQ=Promise.resolve();
@@ -1039,7 +1291,7 @@ function sendSt(){
     w:v.videoWidth||s.width||0,h:v.videoHeight||s.height||0,fps:Math.round(s.frameRate||0),
     zoom:curZoom(),zc:zc?{min:zc.min,max:zc.max,step:zc.step}:null,
     lens:K.lenses.findIndex(l=>l.id===s.deviceId),lenses:K.lenses.length,switching:K.switching,
-    batt:K.batt?{l:K.batt.level,c:K.batt.charging}:null,free:K.free,rtt:K.rtt,hidden:document.hidden});
+    batt:K.batt?{l:K.batt.level,c:K.batt.charging}:null,free:K.free,rtt:K.rtt,hidden:document.hidden,ps:!!K.prevSosp,parte:K.parte||1});
 }
 function camTick(){
   const now=Date.now();
@@ -1049,6 +1301,7 @@ function camTick(){
     else if(now-K.lastSt>=(K.R?1000:3000))sendSt();
   }
   if(++K.tick%30===0)updFree();
+  if(K.tick%5===0)battitoRec();
   updCamUI();
 }
 function initBattery(){try{navigator.getBattery&&navigator.getBattery().then(b=>{K.batt=b;b.onlevelchange=b.onchargingchange=()=>{updCamUI();sendSt()}}).catch(()=>{})}catch(e){}}
@@ -1091,7 +1344,7 @@ function updCamUI(){
 const WCODE=`let h=null,off=0,n=0,q=Promise.resolve();
 async function run(m){
   if(m.op==='open'){const r=await navigator.storage.getDirectory();const d=await r.getDirectoryHandle('palocam',{create:true});const fh=await d.getFileHandle(m.name,{create:true});h=await fh.createSyncAccessHandle();h.truncate(0);off=0;n=0;return{ok:1}}
-  if(m.op==='write'){const b=new Uint8Array(m.buf);let w=0;while(w<b.length){const k=h.write(b.subarray(w),{at:off+w});if(!k)throw new Error('scrittura bloccata');w+=k}off+=b.length;if(++n%5===0)h.flush();return null}
+  if(m.op==='write'){const b=new Uint8Array(m.buf);let w=0;while(w<b.length){const k=h.write(b.subarray(w),{at:off+w});if(!k)throw new Error('scrittura bloccata');w+=k}off+=b.length;h.flush();return null}
   if(m.op==='close'){if(h){h.flush();h.close();h=null}return{ok:1,size:off}}
 }
 onmessage=e=>{const m=e.data;q=q.then(()=>run(m)).then(r=>{if(r&&m.id)postMessage(Object.assign({id:m.id},r))},err=>{postMessage({id:m.id||0,err:(err&&err.name||'Errore')+': '+(err&&err.message||err)})})};`;
@@ -1158,10 +1411,16 @@ async function startRec(at,base){
   if(wait>0)await sleep(Math.min(wait,5000));
   if(R.stopReq){await R.w.close().catch(()=>{});K.R=null;updCamUI();sendSt();return}
   mr.start(1000);R.t0=Date.now();
+  segnaRec(R);
   tune();updCamUI();sendSt();armDim();
 }
+/* Se la pagina si interrompe (browser che va in crash, ricarica, telefono che chiude la pagina) la registrazione
+   riparte DA SOLA appena la pagina si riapre: il segno resta nel telefono finche' non premi Stop. */
+function segnaRec(R){LS.set('recViva',{code:K.code,name:K.name,file:R.name,t0:R.t0,ult:Date.now(),parte:K.parte||1})}
+function battitoRec(){const m=LS.get('recViva',null);if(m&&K.R&&K.R.t0&&!K.R.stopping){m.ult=Date.now();LS.set('recViva',m)}}
 function stopRec(){
   const R=K.R;if(!R)return;
+  LS.set('recViva',null);
   if(!R.mr||R.mr.state==='inactive'){R.stopReq=true;return}
   if(R.stopping)return;R.stopping=true;
   try{R.mr.stop()}catch(e){finishRec(R)}
@@ -1169,11 +1428,13 @@ function stopRec(){
 }
 async function finishRec(R){
   if(R.done)return;R.done=true;
+  LS.set('recViva',null);
   let size=R.bytes;
   try{const s=await R.w.close();if(s!=null)size=s}catch(e){camErr('Chiusura file non riuscita: '+e.message)}
   if(K.R===R)K.R=null;
   dimOff();tune();updCamUI();sendSt();updFree();refreshFilesN();
   camSend({t:'saved',name:R.name,size});
+  if(K.prevSosp&&K.conn&&K.conn.open){K.prevSosp=false;remakeCall()}
   toast('Video salvato in “Video” ('+gb(size)+')','ok');
   if(K.needReopen){K.needReopen=false;reopenVideo(K.v&&K.v.getSettings().deviceId)}
 }
@@ -1259,7 +1520,8 @@ async function openFiles(){
   setSeg($('#camSeg'),(qs.get('cam')||LS.get('camName','A')).toUpperCase()==='B'?'B':'A');
   $('#camSeg').onclick=e=>{const b=e.target.closest('button');if(b)setSeg($('#camSeg'),b.dataset.v)};
   $('#codeIn').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);$('#homeMsg').textContent=''};
-  $('#bCtrl').onclick=startCtrl;$('#bCam').onclick=startCam;$('#bFilesHome').onclick=openFiles;
+  $('#bCtrl').onclick=()=>licPoi(startCtrl);$('#bCam').onclick=()=>startCam();$('#bFilesHome').onclick=openFiles;
+  licWire();licInfo();setTimeout(()=>licControlla(false,'avvio'),1500);
   refreshFilesN();
   /* app installabile: service worker + pulsante "Installa" quando Chrome lo permette */
   if(!NAT&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -1268,6 +1530,12 @@ async function openFiles(){
   window.addEventListener('appinstalled',()=>{$('#pInst').hidden=true;toast('Goal Recorder installata: la trovi tra le app','ok')});
   $('#bInst').onclick=async()=>{if(!instEv)return;instEv.prompt();try{await instEv.userChoice}catch(e){}instEv=null;$('#pInst').hidden=true};
   if(!window.Peer)$('#homeMsg').textContent='Libreria di collegamento non caricata: ricarica la pagina.';
+  const rv=LS.get('recViva',null);
+  if(rv&&/^\d{4}$/.test(rv.code||'')&&Date.now()-(rv.ult||0)<4*3600e3){
+    $('#codeIn').value=rv.code;setSeg($('#camSeg'),rv.name==='B'?'B':'A');
+    $('#homeMsg').textContent='Registrazione interrotta: riparto da solo…';
+    setTimeout(()=>{if(MODE==='home')startCam(rv)},600);
+  }else if(rv)LS.set('recViva',null);
 })();
 </script>
 </body>
